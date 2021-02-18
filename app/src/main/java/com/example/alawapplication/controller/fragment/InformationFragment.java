@@ -26,7 +26,7 @@ public class InformationFragment extends Fragment {
     public static final String TAG = "alaw";
     private RecyclerView mRecyclerView;
     private InformationRepository mRepository;
-    private TextView mTxtResponse;
+
 
 
 
@@ -53,13 +53,16 @@ public class InformationFragment extends Fragment {
                 InformationAlaw alaw=new InformationAlaw();
                 try {
                     String response=alaw.getUrlString("https://alaatv.com/api/v2/home");
-                    Log.d(TAG, response);
+                    List<InformationItems> items=mRepository.fetchItems();
+
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mTxtResponse.setText(response);
+                            setUpAdapter(items);
+
                         }
                     });
+                    Log.d(TAG, response);
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(),e );
                 }
@@ -77,12 +80,11 @@ public class InformationFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_information, container, false);
         findViews(view);
         initViews();
-        setUpAdapter();
+        //setUpAdapter();
         return view;
     }
 
-    private void setUpAdapter() {
-        List<InformationItems> items=mRepository.getItems();
+    private void setUpAdapter(List<InformationItems> items) {
         InformationAdapter adapter=new InformationAdapter(items);
         mRecyclerView.setAdapter(adapter);
     }
@@ -93,18 +95,17 @@ public class InformationFragment extends Fragment {
 
     private void findViews(View view) {
         mRecyclerView=view.findViewById(R.id.recycler_view_information);
-        mTxtResponse=view.findViewById(R.id.txt_view_responce);
     }
 
     private class InformationAdapter extends RecyclerView.Adapter<InformationHolder>{
 
         private List<InformationItems> mItems;
 
-        public List<InformationItems> getmItems() {
+        public List<InformationItems> getItems() {
             return mItems;
         }
 
-        public void setmItems(List<InformationItems> mItems) {
+        public void setItems(List<InformationItems> mItems) {
             this.mItems = mItems;
         }
 

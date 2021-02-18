@@ -1,5 +1,7 @@
 package com.example.alawapplication.netWork;
 
+import android.net.Uri;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +11,7 @@ import java.net.URL;
 public class InformationAlaw {
 
     public static final String TAG = "alaa";
+    public static final String BASE_URL="https://alaatv.com/api/v2/home";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException{
 
@@ -41,5 +44,11 @@ public class InformationAlaw {
 
     public String getUrlString(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
+    }
+
+
+    public String getUri(){
+        Uri uri=Uri.parse(BASE_URL).buildUpon().build();
+        return uri.toString();
     }
 }
