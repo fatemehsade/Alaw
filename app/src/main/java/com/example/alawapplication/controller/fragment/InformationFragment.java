@@ -1,29 +1,32 @@
 package com.example.alawapplication.controller.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.TextView;
 
 import com.example.alawapplication.R;
 import com.example.alawapplication.model.InformationItems;
+import com.example.alawapplication.netWork.InformationAlaw;
+import com.example.alawapplication.repository.InformationRepository;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 
 public class InformationFragment extends Fragment {
 
+    public static final String TAG = "alaw";
     private RecyclerView mRecyclerView;
+    private InformationRepository mRepository;
+    private TextView mTxtResponse;
 
 
 
@@ -43,6 +46,27 @@ public class InformationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mRepository=new InformationRepository();
+        Thread thread=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InformationAlaw alaw=new InformationAlaw();
+                try {
+                    String response=alaw.getUrlString("https://alaatv.com/api/v2/home");
+                    Log.d(TAG, response);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTxtResponse.setText(response);
+                        }
+                    });
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage(),e );
+                }
+            }
+        });
+        thread.start();
+
 
     }
 
@@ -58,7 +82,8 @@ public class InformationFragment extends Fragment {
     }
 
     private void setUpAdapter() {
-        InformationAdapter adapter=new InformationAdapter(new ArrayList<>());
+        List<InformationItems> items=mRepository.getItems();
+        InformationAdapter adapter=new InformationAdapter(items);
         mRecyclerView.setAdapter(adapter);
     }
 
@@ -68,6 +93,7 @@ public class InformationFragment extends Fragment {
 
     private void findViews(View view) {
         mRecyclerView=view.findViewById(R.id.recycler_view_information);
+        mTxtResponse=view.findViewById(R.id.txt_view_responce);
     }
 
     private class InformationAdapter extends RecyclerView.Adapter<InformationHolder>{
