@@ -1,13 +1,17 @@
 package com.example.alawapplication.controller.fragment;
 
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,8 +20,8 @@ import com.example.alawapplication.R;
 import com.example.alawapplication.model.InformationItems;
 import com.example.alawapplication.netWork.InformationAlaw;
 import com.example.alawapplication.repository.InformationRepository;
+import com.example.alawapplication.services.ThumbnailDownloader;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -26,8 +30,8 @@ public class InformationFragment extends Fragment {
     public static final String TAG = "alaw";
     private RecyclerView mRecyclerView;
     private InformationRepository mRepository;
-
-
+    private ThumbnailDownloader<InformationHolder> mThumbnailDownloader;
+    private Handler mHandlerUi;
 
 
     public InformationFragment() {
@@ -46,26 +50,38 @@ public class InformationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository=new InformationRepository();
-        Thread thread=new Thread(new Runnable() {
+        mRepository = new InformationRepository();
+
+        mHandlerUi = new Handler();
+        mThumbnailDownloader = new ThumbnailDownloader(mHandlerUi);
+
+        mThumbnailDownloader.start(); //after start(start thread in massageLoop) actually call of getLooper;
+        mThumbnailDownloader.getLooper();//wake up of looper
+        mThumbnailDownloader.setListener(new ThumbnailDownloader.ThumbnailDownloaderListener<InformationHolder>() {
+            @Override
+            public void onThumbnailDownloader(InformationHolder target, Bitmap bitmap) {
+                target.bindBitmap(bitmap);
+            }
+
+
+        });
+
+
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                InformationAlaw alaw=new InformationAlaw();
-                try {
-                    String response=alaw.getUrlString("https://alaatv.com/api/v2/home");
-                    List<InformationItems> items=mRepository.fetchItems();
+                InformationAlaw alaw = new InformationAlaw();
+                //String response=alaw.getUrlString("https://alaatv.com/api/v2/home");
+                List<InformationItems> items = mRepository.fetchItems();
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setUpAdapter(items);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setUpAdapter(items);
 
-                        }
-                    });
-                    Log.d(TAG, response);
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage(),e );
-                }
+                    }
+                });
+                //Log.d(TAG, response);
             }
         });
         thread.start();
@@ -74,10 +90,22 @@ public class InformationFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mThumbnailDownloader.quit();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mThumbnailDownloader.clearQueue();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_information, container, false);
+        View view = inflater.inflate(R.layout.fragment_information, container, false);
         findViews(view);
         initViews();
         //setUpAdapter();
@@ -85,7 +113,7 @@ public class InformationFragment extends Fragment {
     }
 
     private void setUpAdapter(List<InformationItems> items) {
-        InformationAdapter adapter=new InformationAdapter(items);
+        InformationAdapter adapter = new InformationAdapter(items);
         mRecyclerView.setAdapter(adapter);
     }
 
@@ -94,10 +122,10 @@ public class InformationFragment extends Fragment {
     }
 
     private void findViews(View view) {
-        mRecyclerView=view.findViewById(R.id.recycler_view_information);
+        mRecyclerView = view.findViewById(R.id.recycler_view_information);
     }
 
-    private class InformationAdapter extends RecyclerView.Adapter<InformationHolder>{
+    private class InformationAdapter extends RecyclerView.Adapter<InformationHolder> {
 
         private List<InformationItems> mItems;
 
@@ -116,14 +144,19 @@ public class InformationFragment extends Fragment {
         @NonNull
         @Override
         public InformationHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            TextView textView=new TextView(getContext());
-            return new InformationHolder(textView);
+            View view = LayoutInflater.from(getActivity()).inflate(
+                    R.layout.list_item_information,
+                    parent,
+                    false);
+            return new InformationHolder(view);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onBindViewHolder(@NonNull InformationHolder holder, int position) {
+            InformationItems item = mItems.get(position);
 
-            holder.bindInformation(mItems.get(position));
+            holder.bindInformation(item);
 
         }
 
@@ -133,17 +166,30 @@ public class InformationFragment extends Fragment {
         }
     }
 
-    private class InformationHolder extends RecyclerView.ViewHolder{
-        private  TextView textView;
+    public class InformationHolder extends RecyclerView.ViewHolder {
+        private TextView textView;
+        private ImageView mImageViewInfo;
         private InformationItems mItem;
+
         public InformationHolder(@NonNull View itemView) {
             super(itemView);
-            textView= (TextView) itemView;
+            textView = itemView.findViewById(R.id.txt_id);
+            mImageViewInfo = itemView.findViewById(R.id.image_info);
         }
 
-        public void bindInformation(InformationItems items){
-            mItem=items;
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        public void bindInformation(InformationItems items) {
+            mItem = items;
             textView.setText(items.getmTitle());
+            mImageViewInfo.setImageDrawable(getActivity().getDrawable(R.drawable.ic_launcher_background));
+            mThumbnailDownloader.queueThumbnail(this, items.getmUrl());
         }
+
+        public void bindBitmap(Bitmap bitmap) {
+            mImageViewInfo.setImageBitmap(bitmap);
+
+        }
+
+
     }
 }

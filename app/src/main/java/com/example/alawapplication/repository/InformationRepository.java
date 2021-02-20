@@ -33,7 +33,7 @@ public class InformationRepository {
             return items;
 
         } catch (IOException | JSONException e) {
-            //Log.e(TAG, e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
             return null;
         }
     }
