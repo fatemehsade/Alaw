@@ -3,9 +3,6 @@ package com.example.alawapplication.repository;
 import android.util.Log;
 
 import com.example.alawapplication.model.InformationItems;
-import com.example.alawapplication.netWork.model.AlaaResponse;
-import com.example.alawapplication.netWork.model.DataItem;
-import com.example.alawapplication.netWork.model.SetsItem;
 import com.example.alawapplication.netWork.retrofit.AlaaService;
 import com.example.alawapplication.netWork.retrofit.RetrofitInstance;
 
@@ -30,30 +27,16 @@ public class InformationRepository {
     }
 
     public List<InformationItems> fetchItems() {
-        Call<AlaaResponse> call=mService.listItem();
+        Call<List<InformationItems>> call=mService.listItem();
         List<InformationItems> itemsList=new ArrayList<>();
         try {
-            Response<AlaaResponse> response=call.execute();
-            AlaaResponse alaaResponse= response.body();
 
+            Response<List<InformationItems>> response=call.execute();
+            return response.body();
 
-
-            for (DataItem dataItem: alaaResponse.getData()) {
-                if (dataItem.getSets().equals(null))
-                    continue;
-                for (SetsItem setItem:dataItem.getSets()) {
-                    InformationItems item=new InformationItems(
-                            setItem.getId(),setItem.getTitle(),setItem.getUrl().getWeb());
-                    itemsList.add(item);
-
-
-                }
-
-            }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(),e );
-        }finally {
-            return itemsList;
+            return null;
         }
         }
         /*String url = mInformation.getUri();

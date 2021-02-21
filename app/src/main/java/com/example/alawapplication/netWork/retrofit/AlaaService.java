@@ -1,6 +1,8 @@
 package com.example.alawapplication.netWork.retrofit;
 
-import com.example.alawapplication.netWork.model.AlaaResponse;
+import com.example.alawapplication.model.InformationItems;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -9,5 +11,5 @@ import retrofit2.http.GET;
 public interface AlaaService {
 
     @GET(".")
-    Call<AlaaResponse> listItem();
+    Call<List<InformationItems>> listItem();
 }
