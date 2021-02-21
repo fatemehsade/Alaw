@@ -1,11 +1,10 @@
-package com.example.alawapplication.controller.activity;
+package com.example.alawapplication.view.activity;
+
+import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-
-import android.os.Bundle;
 
 import com.example.alawapplication.R;
 
