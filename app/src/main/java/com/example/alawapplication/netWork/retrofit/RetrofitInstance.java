@@ -13,12 +13,19 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitInstance {
+    private static RetrofitInstance sInstance;
+    private Retrofit mRetrofit;
 
-    public static Retrofit getInstance(){
+    public static RetrofitInstance getInstance(){
+        if (sInstance==null)
+            sInstance=new RetrofitInstance();
+        return sInstance;
+    }
 
+    private RetrofitInstance() {
         Object typeAdapter=new GetAlaaItemDeserializer();
         Type type=new TypeToken<List<InformationItems>>(){}.getType();
-        return new Retrofit.Builder()
+        mRetrofit=new Retrofit.Builder()
                 .baseUrl("https://alaatv.com/api/v2/home/")
                 .addConverterFactory(CreateGsonConverter(type,typeAdapter))
                 .build();
@@ -30,5 +37,9 @@ public class RetrofitInstance {
         Gson gson=gsonBuilder.create();
 
         return GsonConverterFactory.create(gson);
+    }
+
+    public Retrofit getmRetrofit() {
+        return mRetrofit;
     }
 }
