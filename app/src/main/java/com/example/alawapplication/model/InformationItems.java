@@ -4,6 +4,11 @@ public class InformationItems {
     private int mId;
     private String mTitle;
     private String mUrl;
+    private Object sets;
+
+    public InformationItems(Object obj) {
+        sets = obj;
+    }
 
     public InformationItems() {
     }

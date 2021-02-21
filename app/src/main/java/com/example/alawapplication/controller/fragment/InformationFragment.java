@@ -52,19 +52,8 @@ public class InformationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mRepository = new InformationRepository();
 
-        mHandlerUi = new Handler();
-        mThumbnailDownloader = new ThumbnailDownloader(mHandlerUi);
 
-        mThumbnailDownloader.start(); //after start(start thread in massageLoop) actually call of getLooper;
-        mThumbnailDownloader.getLooper();//wake up of looper
-        mThumbnailDownloader.setListener(new ThumbnailDownloader.ThumbnailDownloaderListener<InformationHolder>() {
-            @Override
-            public void onThumbnailDownloader(InformationHolder target, Bitmap bitmap) {
-                target.bindBitmap(bitmap);
-            }
-
-
-        });
+        setUpThumbnailDownloader();
 
 
         Thread thread = new Thread(new Runnable() {
@@ -87,6 +76,22 @@ public class InformationFragment extends Fragment {
         thread.start();
 
 
+    }
+
+    private void setUpThumbnailDownloader() {
+        mHandlerUi = new Handler();
+        mThumbnailDownloader = new ThumbnailDownloader(mHandlerUi);
+
+        mThumbnailDownloader.start(); //after start(start thread in massageLoop) actually call of getLooper;
+        mThumbnailDownloader.getLooper();//wake up of looper
+        mThumbnailDownloader.setListener(new ThumbnailDownloader.ThumbnailDownloaderListener<InformationHolder>() {
+            @Override
+            public void onThumbnailDownloader(InformationHolder target, Bitmap bitmap) {
+                target.bindBitmap(bitmap);
+            }
+
+
+        });
     }
 
     @Override
