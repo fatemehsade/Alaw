@@ -6,14 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alawapplication.R;
 import com.example.alawapplication.adapter.InformationAdapter;
+import com.example.alawapplication.databinding.FragmentInformationBinding;
 import com.example.alawapplication.model.InformationItems;
 import com.example.alawapplication.viewModel.AlaaInformationViewModel;
 
@@ -22,8 +23,8 @@ import java.util.List;
 
 public class InformationFragment extends Fragment {
 
+    private FragmentInformationBinding mBinding;
     public static final String TAG = "alaw";
-    private RecyclerView mRecyclerView;
     private AlaaInformationViewModel mInformationViewModel;
 
 
@@ -67,27 +68,27 @@ public class InformationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_information, container, false);
-        findViews(view);
+        mBinding= DataBindingUtil.inflate(
+                inflater,
+                R.layout.fragment_information,
+                container,
+                false);
         initViews();
         //setUpAdapter();
-        return view;
+        return mBinding.getRoot();
     }
 
 
 
     private void setUpAdapter(List<InformationItems> items) {
         InformationAdapter adapter = new InformationAdapter(getActivity(),items);
-        mRecyclerView.setAdapter(adapter);
+        mBinding.recyclerViewInformation.setAdapter(adapter);
     }
 
     private void initViews() {
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.recyclerViewInformation.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void findViews(View view) {
-        mRecyclerView = view.findViewById(R.id.recycler_view_information);
-    }
 
 
 }
