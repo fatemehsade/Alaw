@@ -75,7 +75,7 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         public void bindInformation(InformationItems items) {
             mItem = items;
-            mBinding.txtId.setText(items.getmTitle());
+            mBinding.txtId.setText(items.getTitle());
             mBinding.imageInfo.setImageDrawable(mContext.getDrawable(R.drawable.ic_launcher_background));
             //mThumbnailDownloader.queueThumbnail(this, items.getmUrl());
         }

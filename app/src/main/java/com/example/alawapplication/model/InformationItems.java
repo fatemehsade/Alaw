@@ -1,14 +1,29 @@
 package com.example.alawapplication.model;
 
-public class InformationItems {
-    private int mId;
-    private String mTitle;
-    private String mUrl;
-    private Object sets;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-    public InformationItems(Object obj) {
-        sets = obj;
-    }
+import org.jetbrains.annotations.NotNull;
+
+@Entity(tableName = "information_table")
+public class InformationItems {
+
+    @NotNull
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "idg")
+    private int mIdGenerate;
+
+    @ColumnInfo(name = "id")
+    private int mId;
+
+    @ColumnInfo(name = "title")
+    private String mTitle;
+
+    @ColumnInfo(name = "url")
+    private String mUrl;
+
+
 
     public InformationItems() {
     }
@@ -19,27 +34,35 @@ public class InformationItems {
         this.mUrl = mUrl;
     }
 
-    public int getmId() {
+    public int getId() {
         return mId;
     }
 
-    public void setmId(int mId) {
+    public void setId(int mId) {
         this.mId = mId;
     }
 
-    public String getmTitle() {
+    public String getTitle() {
         return mTitle;
     }
 
-    public void setmTitle(String mTitle) {
+    public void setTitle(String mTitle) {
         this.mTitle = mTitle;
     }
 
-    public String getmUrl() {
+    public String getUrl() {
         return mUrl;
     }
 
-    public void setmUrl(String mUrl) {
+    public void setUrl(String mUrl) {
         this.mUrl = mUrl;
+    }
+
+    public int getIdGenerate() {
+        return mIdGenerate;
+    }
+
+    public void setIdGenerate(int mIdGenerate) {
+        this.mIdGenerate = mIdGenerate;
     }
 }

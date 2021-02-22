@@ -54,9 +54,11 @@ public class InformationFragment extends Fragment {
         mInformationViewModel.getItemsLiveData().observe(this, new Observer<List<InformationItems>>() {
             @Override
             public void onChanged(List<InformationItems> items) {
-                setUpAdapter(items);
+                setUpAdapter(mInformationViewModel.getItem());
             }
         });
+
+
 
 
 
@@ -73,12 +75,18 @@ public class InformationFragment extends Fragment {
                 R.layout.fragment_information,
                 container,
                 false);
+
         initViews();
+
         //setUpAdapter();
         return mBinding.getRoot();
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        setUpAdapter(mInformationViewModel.getItem());
+    }
 
     private void setUpAdapter(List<InformationItems> items) {
         InformationAdapter adapter = new InformationAdapter(getActivity(),items);
